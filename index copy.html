@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zoomable and Pannable Grid</title>
+    <script src="https://d3js.org/d3.v5.min.js"></script>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+        }
+
+        svg {
+            background-color: lightgray;
+        }
+
+        .tile {
+            fill: white;
+            stroke: black;
+        }
+
+        .line {
+            stroke: black;
+            stroke-width: 2;
+        }
+
+        .overview-rect {
+            fill: transparent;
+            stroke: red;
+            stroke-width: 2;
+        }
+
+        .info-box {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background-color: white;
+            border: 1px solid #ccc;
+            padding: 10px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="info-box" id="info-box">
+        <p>Coordinates: <span id="coord"></span></p>
+        <p><a id="link" target="_blank" href="#">View Details</a></p>
+    </div>
+
+    <svg id="grid"></svg>
+    <svg id="overview" width="200" height="200"></svg>
+
+    <script>
+        const width = 1024;
+        const height = 1024;
+        const initialGridSize = 32; // Initial size of each tile
+        const viewBoxWidth = 1024;
+        const viewBoxHeight = 1024;
+
+        const svg = d3.select("#grid")
+            .attr("width", width)
+            .attr("height", height)
+            .attr("viewBox", `-${viewBoxWidth / 2} -${viewBoxHeight / 2} ${viewBoxWidth} ${viewBoxHeight}`)
+            .call(d3.zoom()
+                .scaleExtent([1, 8])
+                .on("zoom", zoomed));
+
+        const g = svg.append("g");
+
+        let currentZoomTransform = d3.zoomIdentity;
+
+        function updateTiles(zoomTransform) {
+            const gridSize = initialGridSize / zoomTransform.k; // Adjust the size based on zoom level
+
+            // Remove existing tiles
+            g.selectAll(".tile").remove();
+
+            // Create new tiles
+            const rows = d3.range(-512, 513, gridSize);
+            const cols = d3.range(-512, 513, gridSize);
+
+            const tiles = g.selectAll(".tile")
+                .data(rows)
+                .enter().append("rect")
+                .attr("class", "tile")
+                .attr("x", d => d)
+                .attr("y", d => d)
+                .attr("width", gridSize)
+                .attr("height", gridSize)
+                .on("click", tileClicked);
+        }
+
+        function drawVerticalLine() {
+            const middleX = 0;
+            const gridSize = initialGridSize / currentZoomTransform.k;
+            svg.selectAll(".line").remove();
+            svg.append("line")
+                .attr("class", "line")
+                .attr("x1", middleX)
+                .attr("y1", -512)
+                .attr("x2", middleX)
+                .attr("y2", 512)
+                .attr("stroke", "black")
+                .attr("stroke-width", gridSize / 2);
+        }
+
+        function drawOverviewRect(zoomTransform) {
+            const overviewSvg = d3.select("#overview");
+
+            const scaleFactor = 2000 / zoomTransform.k; // Scale factor for overview
+            const scaledX = (-512 - zoomTransform.x) * scaleFactor + 100;
+            const scaledY = (-512 - zoomTransform.y) * scaleFactor + 100;
+            const scaledWidth = 1024 * scaleFactor;
+            const scaledHeight = 1024 * scaleFactor;
+
+            overviewSvg.selectAll(".overview-rect").remove();
+            overviewSvg.append("rect")
+                .attr("class", "overview-rect")
+                .attr("x", scaledX)
+                .attr("y", scaledY)
+                .attr("width", scaledWidth)
+                .attr("height", scaledHeight);
+        }
+
+        function zoomed() {
+            currentZoomTransform = d3.event.transform;
+            g.attr("transform", currentZoomTransform);
+            updateTiles(currentZoomTransform);
+            drawVerticalLine();
+            drawOverviewRect(currentZoomTransform);
+        }
+
+        function tileClicked(d) {
+            const x = d;
+            const y = d;
+            const coordElement = document.getElementById("coord");
+            const linkElement = document.getElementById("link");
+            const infoBox = document.getElementById("info-box");
+
+            coordElement.textContent = `${x},${y}`;
+            linkElement.href = `https://upstreet.ai/adventure/#${x},${y}`;
+
+            infoBox.style.display = "block";
+        }
+
+        // Initial rendering
+        updateTiles(currentZoomTransform);
+        drawVerticalLine();
+    </script>
+</body>
+</html>

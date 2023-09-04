@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tile Grid Map</title>
+    <link href="https://api.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.css" rel="stylesheet">
+    <script src="https://api.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.js"></script>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+        #map {
+            width: 90vw;
+            height: 80vh;
+            margin: 5vh auto;
+            position: relative;
+        }
+        #overviewMap {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            width: 150px;
+            height: 150px;
+            z-index: 1000;
+        }
+        #infoBox {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: rgba(255, 255, 255, 0.8);
+            padding: 10px;
+            border-radius: 5px;
+            z-index: 1000;
+        }
+        #info-box{
+            position: absolute;
+            top: 64px;
+            right: 64px;
+            background: white;
+            padding: 10px;
+            display: block;
+            z-index: 1;
+        }
+        body{
+            background-color: #151723;
+            color: #fff;
+        }
+        #coords{
+            color: #000;
+        }
+        .mapboxgl-canvas{
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div style="color: #fff;margin-top: 20px;width: 100%; text-align: center;">
+        Wallet: <input id="wallet" style="width: 500px;" type="text" value="0x4AE0490EF5a18A4AbeB1CEAB7e5e7B8D437563ad">
+        <input type="button" value="Load Wallet" onclick="loadNewWallet()">
+    </div>
+    <div id="info-box" style="display: none;">
+        <p id="coords"></p>
+        <a id="link" target="_blank">Visit on UpStreet</a>
+    </div>
+    <div id="map">
+        <div id="infoBox" style="display:none;"></div>
+        <div id="overviewMap"></div>
+    </div>
+    <script src="app.js"></script>
+</body>
+</html>
