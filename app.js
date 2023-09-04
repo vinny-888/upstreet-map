@@ -18,29 +18,33 @@ const wallet = urlParams.get('wallet')
 if(wallet){
     document.getElementById('wallet').value = wallet;
     loadWallet(wallet);
+} else {
+    loadWallet('');
 }
 
 function loadNewWallet(){
     let newWallet = document.getElementById('wallet').value;
-    window.location = '/' + replaceQueryParam('wallet', newWallet, window.location.search)
+    window.location = '/upstreet-map/' + replaceQueryParam('wallet', newWallet, window.location.search)
 }
 
 async function loadNFTs(wallet){
-    let url = 'https://eth-mainnet.g.alchemy.com/nft/v2/demo/getNFTs?contractAddresses[]=0xcbF4BEB93B2eAA4E148D347553A9bd8fEd0D7Da3&owner='+wallet+'&withMetadata=true';
-    const response = await fetch(url);
-    const tiles = await response.json();
-    console.log(tiles);
+    if(wallet){
+        let url = 'https://eth-mainnet.g.alchemy.com/nft/v2/demo/getNFTs?contractAddresses[]=0xcbF4BEB93B2eAA4E148D347553A9bd8fEd0D7Da3&owner='+wallet+'&withMetadata=true';
+        const response = await fetch(url);
+        const tiles = await response.json();
+        console.log(tiles);
 
-    for(let i=0; i<tiles.ownedNfts.length; i++){
-        let tileMetadata = tiles.ownedNfts[i].metadata;
-        let location = tileMetadata.attributes.find((att)=>att.trait_type == 'Location');
-        let loc = location.value.replace('[', '').replace(']', '').split(',')
-        ownedNFTs.push({
-            x: parseInt(loc[0]),
-            y: parseInt(loc[1])
-        })
+        for(let i=0; i<tiles.ownedNfts.length; i++){
+            let tileMetadata = tiles.ownedNfts[i].metadata;
+            let location = tileMetadata.attributes.find((att)=>att.trait_type == 'Location');
+            let loc = location.value.replace('[', '').replace(']', '').split(',')
+            ownedNFTs.push({
+                x: parseInt(loc[0]),
+                y: parseInt(loc[1])
+            })
+        }
+        console.log('ownedNFTs:',ownedNFTs);
     }
-    console.log('ownedNFTs:',ownedNFTs);
 }
 
 function loadWallet(wallet){
