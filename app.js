@@ -52,8 +52,8 @@ async function loadNFTs(wallets){
 
         if(false){
             let start = 0;
-            for(let i=start; i<wallets.length; i++){
-                let newWallet = wallets[i];
+            for(let i=start; i<holders_wallets.length; i++){
+                let newWallet = holders_wallets[i];
                 ownedNFTs[newWallet] = [];
                 console.log('wallet: ', newWallet);
                 let url = 'https://eth-mainnet.g.alchemy.com/nft/v2/demo/getNFTs?contractAddresses[]=0xcbF4BEB93B2eAA4E148D347553A9bd8fEd0D7Da3&owner='+newWallet+'&withMetadata=true';
