@@ -191,7 +191,7 @@ function loadWallet(walletArr){
                     // '#088',    // Default color for other tiles
                     
                 ],
-                'fill-opacity': 0.8,
+                'fill-opacity': 0.9,
                 // 'fill-outline-color': '#888'
             },
         });
@@ -202,7 +202,7 @@ function loadWallet(walletArr){
             source: 'grid32',
             layout: {},
             paint: {
-                'line-color': '#0f0',
+                'line-color': '#AAA',
                 'line-opacity': 0.5,
             },
         });
@@ -353,7 +353,7 @@ function getOwner(x,y){
     }else if(x == 0){
         return '#000';
     } else {
-        return ownerIndex != -1 ? stringToColor(ownerWallet) : '#088';
+        return ownerIndex != -1 ? stringToColor(ownerWallet) : '#fff';
     }
 }
 
