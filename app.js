@@ -6,24 +6,6 @@ let selectedFeatureID = null;
 let ownedNFTs = {};
 let mainMap = null;
 
-const colors = [
-    "#FF0000", "#00FF00", "#0000FF", "#FFFF00", "#FF00FF", "#00FFFF", "#FF8000", "#FF0080", "#80FF00", "#00FF80", 
-    "#8000FF", "#0080FF", "#80FF80", "#FF8080", "#8080FF", "#800080", "#448044", "#808000", "#C0C0C0", "#400000",
-    "#004000", "#000040", "#404000", "#400040", "#004040", "#800040", "#408000", "#004080", "#408040", "#404080", 
-    "#804040", "#40FF40", "#804080", "#4080FF", "#FF4080", "#40FFFF", "#FF4040", "#40FF80", "#808040", "#404040", 
-    "#808080", "#FF8040", "#80FF40", "#FF4080", "#40FF00", "#8000C0", "#80C080", "#4480C0", "#8080C0", "#800040", 
-    "#408000", "#400080", "#C040C0", "#C04040", "#40C0C0", "#4040C0", "#C0C040", "#40C040", "#C04080", "#80C040", 
-    "#4080C0", "#C08080", "#8080C0", "#C0C0FF", "#FFFFC0", "#FFC0FF", "#C0FFFF", "#80C0C0", "#C0FF80", "#80FFC0", 
-    "#FFC080", "#80C0FF", "#C080C0", "#C08040", "#FF80C0", "#C0FF40", "#40C080", "#C0FFC0", "#FFC0C0", "#80FF80", 
-    "#FF8080", "#80C080", "#8080FF", "#C080FF", "#80FFC0", "#80C0FF", "#C08080", "#FFC080", "#FF80FF", "#C0FF80", 
-    "#80C0C0", "#80FF80", "#FFD700", "#ADFF2F", "#FA8072", "#F4A460", "#2E8B57", "#DAA520", "#DC143C", "#5F9EA0", 
-    "#A0522D", "#7B68EE", "#00CED1", "#9ACD32", "#9400D3", "#FF69B4", "#696969", "#228B22", "#A9A9A9", "#556B2F", 
-    "#BDB76B", "#9370DB", "#3CB371", "#B0E0E6", "#32CD32", "#66CDAA", "#BA55D3", "#4169E1", "#708090", "#6B8E23", 
-    "#FFA07A", "#20B2AA", "#191970", "#E9967A", "#48D1CC", "#8B0000", "#2F4F4F", "#FF4500", "#6495ED", "#90EE90", 
-    "#7FFF00", "#87CEFA", "#FFDAB9", "#B8860B", "#4682B4", "#EE82EE", "#8A2BE2", "#FF6347", "#00FA9A", "#40E0D0", 
-    "#8B008B"];
-
-
 function replaceQueryParam(param, newval, search) {
     var regex = new RegExp("([?;&])" + param + "[^&;]*[;&]?");
     var query = search.replace(regex, "$1").replace(/&$/, '');
@@ -317,11 +299,13 @@ function isOwned(x,y){
 
 function getOwner(x,y){
     let ownerIndex = -1;
+    let ownerWallet = '';
     let owners = Object.keys(ownedNFTs)
     owners.forEach((owner, index)=>{
         ownedNFTs[owner].forEach((tile)=>{
             if(tile.x == x && tile.y == y){
                 ownerIndex = index;
+                ownerWallet = owner;
             }
         })
     });
@@ -331,6 +315,23 @@ function getOwner(x,y){
     }else if(x == 0){
         return '#000';
     } else {
-        return ownerIndex != -1 ? colors[ownerIndex] : '#088';
+        return ownerIndex != -1 ? stringToColor(ownerWallet) : '#088';
     }
 }
+
+function stringToColor(str) {
+    // Generate a hash of the string
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) {
+      hash = str.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    
+    // Convert the hash to a 6-digit hexadecimal color
+    let color = '#';
+    for (let i = 0; i < 3; i++) {
+      const value = (hash >> (i * 12)) & 0xFF;
+      color += ('00' + value.toString(16)).substr(-2);
+    }
+    
+    return color;
+  }
