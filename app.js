@@ -90,7 +90,9 @@ async function loadNFTs(wallets){
                 await new Promise(r => setTimeout(r, (60/20)*1000));
             }
         } else {
-            Object.keys(all_wallets).forEach((wallet)=>{
+            let count = 0;
+            let walletArr = Object.keys(all_wallets);
+            walletArr.forEach((wallet)=>{
                 ownedNFTs[wallet] = [];
                 all_wallets[wallet].forEach((tile)=>{
                     if(tile.x != null && tile.y != null){
@@ -98,16 +100,21 @@ async function loadNFTs(wallets){
                             x: tile.x,
                             y: tile.y 
                         })
+                        count++;
                     }
                 })
             })
-            console.log('claimed:', ownedNFTs.length);
-            console.log('unclaimed:', all_wallets.length-ownedNFTs.length);
+            // console.log('claimed:', ownedNFTs.length);
+            // console.log('unclaimed:', all_wallets.length-ownedNFTs.length);
+
+            document.getElementById('claimed').innerHTML = 'Claimed: ' + count;
+            document.getElementById('owners').innerHTML = ' Owners: ' + walletArr.length;
         }
         
     }else {
 
         ownedNFTs = {}
+        let count = 0;
         for(let i=0; i<wallets.length; i++){
             let wallet = wallets[i];
             let url = 'https://eth-mainnet.g.alchemy.com/nft/v2/demo/getNFTs?contractAddresses[]=0xcbF4BEB93B2eAA4E148D347553A9bd8fEd0D7Da3&owner='+wallet+'&withMetadata=true';
@@ -123,10 +130,12 @@ async function loadNFTs(wallets){
                     x: parseInt(loc[0]),
                     y: parseInt(loc[1])
                 })
+                count++;
             }
             console.log('ownedNFTs:',ownedNFTs);
             // await new Promise(r => setTimeout(r, (60/10)*1000));
         }
+
     }
 }
 
