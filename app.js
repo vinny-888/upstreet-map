@@ -3,8 +3,20 @@ mapboxgl.accessToken = 'pk.eyJ1Ijoidmlubnk4ODgiLCJhIjoiY2xtNWRteTlxMWQwdjNmcDZhc
 const tileSizes = [1, 2, 4, 8, 16, 32];
 const zoomLevels = [11, 12, 13, 14, 15, 16];
 let selectedFeatureID = null;
-let ownedNFTs = [];
+let ownedNFTs = {};
 let mainMap = null;
+
+let colors = [
+    '#e6194b', '#3cb44b', '#ffe119', '#4363d8', '#f58231', '#911eb4', '#46f0f0', '#f032e6', '#bcf60c', '#fabebe', 
+    '#008080', '#e6beff', '#9a6324', '#fffac8', '#800000', '#aaffc3', '#808000', '#ffd8b1', '#000075', '#808080',
+    '#e6194b', '#3cb44b', '#ffe119', '#4363d8', '#f58231', '#911eb4', '#46f0f0', '#f032e6', '#bcf60c', '#fabebe', 
+    '#008080', '#e6beff', '#9a6324', '#fffac8', '#800000', '#aaffc3', '#808000', '#ffd8b1', '#000075', '#808080',
+    '#e6194b', '#3cb44b', '#ffe119', '#4363d8', '#f58231', '#911eb4', '#46f0f0', '#f032e6', '#bcf60c', '#fabebe', 
+    '#008080', '#e6beff', '#9a6324', '#fffac8', '#800000', '#aaffc3', '#808000', '#ffd8b1', '#000075', '#808080',
+    '#e6194b', '#3cb44b', '#ffe119', '#4363d8', '#f58231', '#911eb4', '#46f0f0', '#f032e6', '#bcf60c', '#fabebe', 
+    '#008080', '#e6beff', '#9a6324', '#fffac8', '#800000', '#aaffc3', '#808000', '#ffd8b1', '#000075', '#808080',
+    '#e6194b', '#3cb44b', '#ffe119', '#4363d8', '#f58231', '#911eb4', '#46f0f0', '#f032e6', '#bcf60c', '#fabebe', 
+    '#008080', '#e6beff', '#9a6324', '#fffac8', '#800000', '#aaffc3', '#808000', '#ffd8b1', '#000075', '#808080',];
 
 function replaceQueryParam(param, newval, search) {
     var regex = new RegExp("([?;&])" + param + "[^&;]*[;&]?");
@@ -17,9 +29,11 @@ const urlParams = new URLSearchParams(window.location.search);
 const wallet = urlParams.get('wallet')
 if(wallet){
     document.getElementById('wallet').value = wallet;
-    loadWallet(wallet);
+    let walletArr = wallet.split(',')
+
+    loadWallet(walletArr);
 } else {
-    loadWallet('');
+    loadWallet(['']);
 }
 
 function loadNewWallet(){
@@ -27,13 +41,14 @@ function loadNewWallet(){
     window.location = '/upstreet-map/' + replaceQueryParam('wallet', newWallet, window.location.search)
 }
 
-async function loadNFTs(wallet){
-    if(!wallet){
+async function loadNFTs(wallets){
+    if(!wallets || wallets[0] == ''){
 
         if(false){
             let start = 0;
             for(let i=start; i<wallets.length; i++){
                 let newWallet = wallets[i];
+                ownedNFTs[newWallet] = [];
                 console.log('wallet: ', newWallet);
                 let url = 'https://eth-mainnet.g.alchemy.com/nft/v2/demo/getNFTs?contractAddresses[]=0xcbF4BEB93B2eAA4E148D347553A9bd8fEd0D7Da3&owner='+newWallet+'&withMetadata=true';
                 try{
@@ -45,7 +60,7 @@ async function loadNFTs(wallet){
                         let tileMetadata = tiles.ownedNfts[i].metadata;
                         let location = tileMetadata.attributes.find((att)=>att.trait_type == 'Location');
                         let loc = location.value.replace('[', '').replace(']', '').split(',')
-                        ownedNFTs.push({
+                        ownedNFTs[newWallet].push({
                             x: parseInt(loc[0]),
                             y: parseInt(loc[1])
                         })
@@ -58,38 +73,47 @@ async function loadNFTs(wallet){
                 await new Promise(r => setTimeout(r, (60/2)*1000));
             }
         } else {
-            all_wallets.forEach((tile)=>{
-                if(tile.x != null && tile.y != null){
-                    ownedNFTs.push({
-                        x: tile.x,
-                        y: tile.y 
-                    })
-                }
+            Object.keys(all_wallets).forEach((wallet)=>{
+                ownedNFTs[wallet] = [];
+                all_wallets[wallet].forEach((tile)=>{
+                    if(tile.x != null && tile.y != null){
+                        ownedNFTs[wallet].push({
+                            x: tile.x,
+                            y: tile.y 
+                        })
+                    }
+                })
             })
             console.log('claimed:', ownedNFTs.length);
             console.log('unclaimed:', all_wallets.length-ownedNFTs.length);
         }
         
     }else {
-        let url = 'https://eth-mainnet.g.alchemy.com/nft/v2/demo/getNFTs?contractAddresses[]=0xcbF4BEB93B2eAA4E148D347553A9bd8fEd0D7Da3&owner='+wallet+'&withMetadata=true';
-        const response = await fetch(url);
-        const tiles = await response.json();
-        console.log(tiles);
 
-        for(let i=0; i<tiles.ownedNfts.length; i++){
-            let tileMetadata = tiles.ownedNfts[i].metadata;
-            let location = tileMetadata.attributes.find((att)=>att.trait_type == 'Location');
-            let loc = location.value.replace('[', '').replace(']', '').split(',')
-            ownedNFTs.push({
-                x: parseInt(loc[0]),
-                y: parseInt(loc[1])
-            })
+        ownedNFTs = {}
+        for(let i=0; i<wallets.length; i++){
+            let wallet = wallets[i];
+            let url = 'https://eth-mainnet.g.alchemy.com/nft/v2/demo/getNFTs?contractAddresses[]=0xcbF4BEB93B2eAA4E148D347553A9bd8fEd0D7Da3&owner='+wallet+'&withMetadata=true';
+            const response = await fetch(url);
+            const tiles = await response.json();
+            console.log(tiles);
+            ownedNFTs[wallet] = [];
+            for(let i=0; i<tiles.ownedNfts.length; i++){
+                let tileMetadata = tiles.ownedNfts[i].metadata;
+                let location = tileMetadata.attributes.find((att)=>att.trait_type == 'Location');
+                let loc = location.value.replace('[', '').replace(']', '').split(',')
+                ownedNFTs[wallet].push({
+                    x: parseInt(loc[0]),
+                    y: parseInt(loc[1])
+                })
+            }
+            console.log('ownedNFTs:',ownedNFTs);
+            // await new Promise(r => setTimeout(r, (60/10)*1000));
         }
-        console.log('ownedNFTs:',ownedNFTs);
     }
 }
 
-function loadWallet(wallet){
+function loadWallet(walletArr){
 
     mainMap = new mapboxgl.Map({
         container: 'map', 
@@ -100,7 +124,7 @@ function loadWallet(wallet){
 
     mainMap.on('load', async () => {
 
-        await loadNFTs(wallet);
+        await loadNFTs(walletArr);
     
         const grid1 = generateGrid([0, 0], 256/1, 1); // This creates a 1024x1024 grid with each tile being 1x1 units
         const grid2 = generateGrid([0, 0], 256/2, 2);
@@ -131,13 +155,14 @@ function loadWallet(wallet){
                     'case',
                     ['boolean',['feature-state', 'clicked'], false],  // Check if isXZero property is true
                     '#00f',   // Color for tiles where x=0
-                    ['==', ['get', 'isXYZero'], true],  // Check if isXZero property is true
-                    '#fff',   // Color for tiles where x=0
-                    ['==', ['get', 'isXZero'], true],  // Check if isXZero property is true
-                    '#000',   // Color for tiles where x=0
-                    ['==', ['get', 'isOwned'], true],  // Check if isXZero property is true
-                    '#f00',   // Color for tiles where x=0
-                    '#088',    // Default color for other tiles
+                    // ['==', ['get', 'isXYZero'], true],  // Check if isXZero property is true
+                    // '#fff',   // Color for tiles where x=0
+                    // ['==', ['get', 'isXZero'], true],  // Check if isXZero property is true
+                    // '#000',   // Color for tiles where x=0
+                    // ['get', 'isOwned'],  // Check if isXZero property is true
+                    ['get', 'district_type'],
+                    // Otherwise
+                    // '#088',    // Default color for other tiles
                     
                 ],
                 'fill-opacity': 0.8,
@@ -209,7 +234,7 @@ function loadWallet(wallet){
 
 
 
-function generateGrid(center, gridSize, width, offset) {
+function generateGrid(center, gridSize, width, offset, owner) {
 
     const features = [];
     
@@ -225,6 +250,8 @@ function generateGrid(center, gridSize, width, offset) {
         for (let y = -1; y < gridSize; y++) {
             const baseX = start[0] + x * lonChange;
             const baseY = start[1] + y * latChange;
+            const district = getOwner(x-128,y-128);
+            const owned = isOwned(x-128,(y-128)*-1);
             const cube = {
                 type: 'Feature',
                 geometry: {
@@ -241,9 +268,10 @@ function generateGrid(center, gridSize, width, offset) {
                 },
                 properties: {
                     x, y,
-                    isXZero: x === gridSize/2 ? true : false,
-                    isXYZero: x === gridSize/2 && y === gridSize/2 ? true : false,
-                    isOwned: isOwned(x-128,(y-128)*-1)
+                    // isXZero: x === gridSize/2 ? true : false,
+                    // isXYZero: x === gridSize/2 && y === gridSize/2 ? true : false,
+                    isOwned: owned,
+                    district_type: district
                 },
             };
 
@@ -270,10 +298,33 @@ function generateGrid(center, gridSize, width, offset) {
 
 function isOwned(x,y){
     let owned = false;
-    ownedNFTs.forEach((tile)=>{
-        if(tile.x == x && tile.y == y){
-            owned = true;
-        }
-    })
+    let owners = Object.keys(ownedNFTs)
+    owners.forEach((owner)=>{
+        ownedNFTs[owner].forEach((tile)=>{
+            if(tile.x == x && tile.y == y){
+                owned = true;
+            }
+        })
+    });
     return owned;
+}
+
+function getOwner(x,y){
+    let ownerIndex = -1;
+    let owners = Object.keys(ownedNFTs)
+    owners.forEach((owner, index)=>{
+        ownedNFTs[owner].forEach((tile)=>{
+            if(tile.x == x && tile.y == y){
+                ownerIndex = index;
+            }
+        })
+    });
+
+    if(x == 0 && y == 0){
+        return '#fff';
+    }else if(x == 0){
+        return '#000';
+    } else {
+        return ownerIndex != -1 ? colors[ownerIndex] : '#088';
+    }
 }
