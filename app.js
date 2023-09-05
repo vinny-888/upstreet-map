@@ -38,7 +38,7 @@ async function loadNFTs(wallets){
                 let newWallet = holders_wallets[i];
                 ownedNFTs[newWallet] = [];
                 console.log('wallet: ', newWallet);
-                let url = 'https://eth-mainnet.g.alchemy.com/nft/v2/demo/getNFTs?contractAddresses[]=0xcbF4BEB93B2eAA4E148D347553A9bd8fEd0D7Da3&owner='+newWallet+'&withMetadata=true';
+                let url = 'https://eth-mainnet.g.alchemy.com/nft/v2/g3d4-b8b3P8N1puDX_X5HCh5ONljftBB/getNFTs?contractAddresses[]=0xcbF4BEB93B2eAA4E148D347553A9bd8fEd0D7Da3&owner='+newWallet+'&withMetadata=true';
                 try{
                     const response = await fetch(url);
                     const tiles = await response.json();
@@ -48,17 +48,46 @@ async function loadNFTs(wallets){
                         let tileMetadata = tiles.ownedNfts[i].metadata;
                         let location = tileMetadata.attributes.find((att)=>att.trait_type == 'Location');
                         let loc = location.value.replace('[', '').replace(']', '').split(',')
-                        ownedNFTs[newWallet].push({
-                            x: parseInt(loc[0]),
-                            y: parseInt(loc[1])
-                        })
+                        if(loc[0] != null && loc[1] != null){
+                            ownedNFTs[newWallet].push({
+                                x: parseInt(loc[0]),
+                                y: parseInt(loc[1])
+                            })
+                        }
                     }
                     console.log('i='+i, JSON.stringify(ownedNFTs));
+                    await new Promise(r => setTimeout(r, (60/20)*1000));
+                    let pageKey = tiles.pageKey;
+                    while(pageKey){
+                        let url2 = 'https://eth-mainnet.g.alchemy.com/nft/v2/g3d4-b8b3P8N1puDX_X5HCh5ONljftBB/getNFTs?contractAddresses[]=0xcbF4BEB93B2eAA4E148D347553A9bd8fEd0D7Da3&owner='+newWallet+'&withMetadata=true&pageKey='+pageKey;
+                        try{
+                            const response2 = await fetch(url2);
+                            const tiles2 = await response2.json();
+                            console.log(tiles);
+                    
+                            for(let i=0; i<tiles2.ownedNfts.length; i++){
+                                let tileMetadata = tiles2.ownedNfts[i].metadata;
+                                let location = tileMetadata.attributes.find((att)=>att.trait_type == 'Location');
+                                let loc = location.value.replace('[', '').replace(']', '').split(',')
+                                if(loc[0] != null && loc[1] != null){
+                                    ownedNFTs[newWallet].push({
+                                        x: parseInt(loc[0]),
+                                        y: parseInt(loc[1])
+                                    })
+                                }
+                            }
+                            console.log('i='+i, JSON.stringify(ownedNFTs));
+                            pageKey = tiles2.pageKey;
+                        } catch(err){
+                            console.log(err);
+                        }
+                        await new Promise(r => setTimeout(r, (60/20)*1000));
+                    }
                 } catch(err){
                     console.log(err);
                     i--;
                 }
-                await new Promise(r => setTimeout(r, (60/2)*1000));
+                await new Promise(r => setTimeout(r, (60/20)*1000));
             }
         } else {
             Object.keys(all_wallets).forEach((wallet)=>{
