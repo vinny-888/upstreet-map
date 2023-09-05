@@ -217,7 +217,7 @@ function loadWallet(walletArr){
     
         const clickedFeature = features[0];
         const x = clickedFeature.properties.x-128;
-        const y = clickedFeature.properties.y-128;
+        const y = (clickedFeature.properties.y-128) * -1;
         
     
         if(typeof selectedFeatureID === 'number') { // Need to change this
