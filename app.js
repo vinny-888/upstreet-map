@@ -106,8 +106,8 @@ function loadWallet(wallet){
         const grid2 = generateGrid([0, 0], 256/2, 2);
         const grid4 = generateGrid([0, 0], 256/4, 4);
         const grid8 = generateGrid([0, 0], 256/8, 8);
-        const grid16 = generateGrid([0, 0], 256/16, 16);
-        const grid32 = generateGrid([0, 0], 256/32, 32, 16);
+        const grid16 = generateGrid([0, 0], 256/16, 16.5);
+        const grid32 = generateGrid([0, 0], 256/32, 32, 16.5);
     
         mainMap.addSource('grid1', {
             type: 'geojson',
