@@ -141,6 +141,7 @@ function loadWallet(wallet){
                     
                 ],
                 'fill-opacity': 0.8,
+                // 'fill-outline-color': '#888'
             },
         });
 
@@ -220,8 +221,8 @@ function generateGrid(center, gridSize, width, offset) {
         center[1] - (gridSize * latChange) / 2 + ((offset ? offset : 0) * lonChange/width),
     ];
 
-    for (let x = 0; x < gridSize; x++) {
-        for (let y = 0; y < gridSize; y++) {
+    for (let x = -1; x < gridSize; x++) {
+        for (let y = -1; y < gridSize; y++) {
             const baseX = start[0] + x * lonChange;
             const baseY = start[1] + y * latChange;
             const cube = {
