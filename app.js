@@ -107,11 +107,17 @@ function loadWallet(wallet){
         const grid4 = generateGrid([0, 0], 256/4, 4);
         const grid8 = generateGrid([0, 0], 256/8, 8);
         const grid16 = generateGrid([0, 0], 256/16, 16);
-        const grid32 = generateGrid([0, 0], 256/32, 32);
+        const grid32 = generateGrid([0, 0], 256/32, 32, 0.5);
     
         mainMap.addSource('grid1', {
             type: 'geojson',
             data: grid1,
+            generateId: true
+        });
+
+        mainMap.addSource('grid32', {
+            type: 'geojson',
+            data: grid32,
             generateId: true
         });
     
@@ -123,20 +129,34 @@ function loadWallet(wallet){
             paint: {
                 'fill-color': [
                     'case',
+                    ['boolean',['feature-state', 'clicked'], false],  // Check if isXZero property is true
+                    '#00f',   // Color for tiles where x=0
+                    ['==', ['get', 'isXYZero'], true],  // Check if isXZero property is true
+                    '#fff',   // Color for tiles where x=0
                     ['==', ['get', 'isXZero'], true],  // Check if isXZero property is true
                     '#000',   // Color for tiles where x=0
                     ['==', ['get', 'isOwned'], true],  // Check if isXZero property is true
                     '#f00',   // Color for tiles where x=0
-                    ['boolean',['feature-state', 'clicked'], false],  // Check if isXZero property is true
-                    '#00f',   // Color for tiles where x=0
                     '#088',    // Default color for other tiles
                     
                 ],
                 'fill-opacity': 0.8,
             },
         });
+
+        mainMap.addLayer({
+            id: 'grid-32',
+            type: 'line',
+            source: 'grid32',
+            layout: {},
+            paint: {
+                'line-color': '#0f0',
+                'line-opacity': 0.5,
+            },
+        });
     
         mainMap.setLayoutProperty(`grid-1`, 'visibility', 'visible');
+        mainMap.setLayoutProperty(`grid-32`, 'visibility', 'visible');
         
         // Fit the map to the grid's bounds
         mainMap.fitBounds(grid1.bounds, {
@@ -188,16 +208,16 @@ function loadWallet(wallet){
 
 
 
-function generateGrid(center, gridSize) {
+function generateGrid(center, gridSize, width, offset) {
 
     const features = [];
     
-    const latChange = 64 / 111000; // approximately 0.000576
+    const latChange = 64 / 111000 * width; // approximately 0.000576
     const lonChange = latChange; // approximation
 
     const start = [
-        center[0] - (gridSize * lonChange) / 2,
-        center[1] - (gridSize * latChange) / 2,
+        center[0] - (gridSize * lonChange) / 2 + ((offset ? offset : 0) * lonChange/width),
+        center[1] - (gridSize * latChange) / 2 + ((offset ? offset : 0) * lonChange/width),
     ];
 
     for (let x = 0; x < gridSize; x++) {
@@ -221,6 +241,7 @@ function generateGrid(center, gridSize) {
                 properties: {
                     x, y,
                     isXZero: x === gridSize/2 ? true : false,
+                    isXYZero: x === gridSize/2 && y === gridSize/2 ? true : false,
                     isOwned: isOwned(x-128,(y-128)*-1)
                 },
             };
