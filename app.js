@@ -28,7 +28,49 @@ function loadNewWallet(){
 }
 
 async function loadNFTs(wallet){
-    if(wallet){
+    if(!wallet){
+
+        if(false){
+            let start = 0;
+            for(let i=start; i<wallets.length; i++){
+                let newWallet = wallets[i];
+                console.log('wallet: ', newWallet);
+                let url = 'https://eth-mainnet.g.alchemy.com/nft/v2/demo/getNFTs?contractAddresses[]=0xcbF4BEB93B2eAA4E148D347553A9bd8fEd0D7Da3&owner='+newWallet+'&withMetadata=true';
+                try{
+                    const response = await fetch(url);
+                    const tiles = await response.json();
+                    console.log(tiles);
+            
+                    for(let i=0; i<tiles.ownedNfts.length; i++){
+                        let tileMetadata = tiles.ownedNfts[i].metadata;
+                        let location = tileMetadata.attributes.find((att)=>att.trait_type == 'Location');
+                        let loc = location.value.replace('[', '').replace(']', '').split(',')
+                        ownedNFTs.push({
+                            x: parseInt(loc[0]),
+                            y: parseInt(loc[1])
+                        })
+                    }
+                    console.log('i='+i, JSON.stringify(ownedNFTs));
+                } catch(err){
+                    console.log(err);
+                    i--;
+                }
+                await new Promise(r => setTimeout(r, (60/2)*1000));
+            }
+        } else {
+            all_wallets.forEach((tile)=>{
+                if(tile.x != null && tile.y != null){
+                    ownedNFTs.push({
+                        x: tile.x,
+                        y: tile.y 
+                    })
+                }
+            })
+            console.log('claimed:', ownedNFTs.length);
+            console.log('unclaimed:', all_wallets.length-ownedNFTs.length);
+        }
+        
+    }else {
         let url = 'https://eth-mainnet.g.alchemy.com/nft/v2/demo/getNFTs?contractAddresses[]=0xcbF4BEB93B2eAA4E148D347553A9bd8fEd0D7Da3&owner='+wallet+'&withMetadata=true';
         const response = await fetch(url);
         const tiles = await response.json();
