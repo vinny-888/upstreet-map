@@ -241,7 +241,7 @@ function generateGrid(center, gridSize, width, offset, owner) {
         for (let y = -1; y < gridSize; y++) {
             const baseX = start[0] + x * lonChange;
             const baseY = start[1] + y * latChange;
-            const district = getOwner(x-128,y-128);
+            const district = getOwner(x-128,(y-128)*-1);
             const owned = isOwned(x-128,(y-128)*-1);
             const cube = {
                 type: 'Feature',
