@@ -159,11 +159,28 @@ function loadWallet(walletArr){
         await loadNFTs(walletArr);
     
         const grid1 = generateGrid([0, 0], 256/1, 1); // This creates a 1024x1024 grid with each tile being 1x1 units
-        const grid2 = generateGrid([0, 0], 256/2, 2);
-        const grid4 = generateGrid([0, 0], 256/4, 4);
-        const grid8 = generateGrid([0, 0], 256/8, 8);
-        const grid16 = generateGrid([0, 0], 256/16, 16.5);
+        // const grid2 = generateGrid([0, 0], 256/2, 2);
+        // const grid4 = generateGrid([0, 0], 256/4, 4);
+        // const grid8 = generateGrid([0, 0], 256/8, 8);
+        // const grid16 = generateGrid([0, 0], 256/16, 16.5);
         const grid32 = generateGrid([0, 0], 256/32, 32, 16.5);
+
+        const overlay = generateOverlay([0, 0], 256, 1/36.5, 0.5)
+
+        mainMap.addSource("myImageSource", {
+            "type": "image",
+            "url": "./map/0_0.png",
+            "coordinates": overlay
+        });
+
+        mainMap.addLayer({
+            "id": "overlay",
+            "source": "myImageSource",
+            "type": "raster",
+            "paint": {
+            "raster-opacity": 1.0
+            }
+        });
     
         mainMap.addSource('grid1', {
             type: 'geojson',
@@ -198,9 +215,12 @@ function loadWallet(walletArr){
                     
                 ],
                 'fill-opacity': 0.9,
-                // 'fill-outline-color': '#888'
+                // 'fill-outline-color': '#888',
+                // 'fill-outline-opacity': 0
             },
         });
+
+        
 
         mainMap.addLayer({
             id: 'grid-32',
@@ -215,6 +235,7 @@ function loadWallet(walletArr){
     
         mainMap.setLayoutProperty(`grid-1`, 'visibility', 'visible');
         mainMap.setLayoutProperty(`grid-32`, 'visibility', 'visible');
+        mainMap.setLayoutProperty(`overlay`, 'visibility', 'none');
         
         // Fit the map to the grid's bounds
         mainMap.fitBounds(grid1.bounds, {
@@ -269,7 +290,7 @@ function loadWallet(walletArr){
 function generateGrid(center, gridSize, width, offset, owner) {
 
     const features = [];
-    
+
     const latChange = 64 / 111000 * width; // approximately 0.000576
     const lonChange = latChange; // approximation
 
@@ -328,6 +349,29 @@ function generateGrid(center, gridSize, width, offset, owner) {
     };
 }
 
+function generateOverlay(center, gridSize, width, offset) {
+
+    const latChange = 64 / 111000 * width; // approximately 0.000576
+    const lonChange = latChange; // approximation
+
+    const start = [
+        center[0] - (gridSize * lonChange) / 2 + ((offset ? offset : 0) * lonChange/width),
+        center[1] - (gridSize * latChange) / 2 + ((offset ? offset : 0) * lonChange/width),
+    ];
+
+    const baseX1 = start[0];
+    const baseX2 = start[0] + 256 * lonChange;
+    const baseY1 = start[1];
+    const baseY2 = start[1] + 256 * latChange;
+
+    return [
+        [baseX1, baseY1],
+        [baseX1, baseY2],
+        [baseX2, baseY2],
+        [baseX2, baseY1],
+    ];
+}
+
 function isOwned(x,y){
     let owned = false;
     let owners = Object.keys(ownedNFTs)
@@ -378,4 +422,24 @@ function stringToColor(str) {
     }
     
     return color;
-  }
+}
+
+function toggleMap() {
+    const clickedLayer = 'overlay';
+     
+    const visibility = mainMap.getLayoutProperty(
+        clickedLayer,
+        'visibility'
+    );
+     
+    // Toggle layer visibility by changing the layout object's visibility property.
+    if (visibility === 'visible') {
+        mainMap.setLayoutProperty(clickedLayer, 'visibility', 'none');
+        mainMap.setPaintProperty('grid-1', 'fill-opacity', 0.9);
+        mainMap.setPaintProperty('grid-1', 'fill-outline-color', undefined);
+    } else {
+        mainMap.setLayoutProperty(clickedLayer, 'visibility', 'visible');
+        mainMap.setPaintProperty('grid-1', 'fill-opacity', 0.25);
+        mainMap.setPaintProperty('grid-1', 'fill-outline-color', '#888888');
+    }
+}
