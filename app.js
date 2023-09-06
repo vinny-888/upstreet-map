@@ -38,6 +38,12 @@ async function loadNFTs(wallets){
                 let newWallet = holders_wallets[i];
                 ownedNFTs[newWallet] = [];
                 console.log('wallet: ', newWallet);
+                // Holders
+                // https://etherscan.io/token/0xcbf4beb93b2eaa4e148d347553a9bd8fed0d7da3#balances
+
+                // Alchemy reset
+                // https://eth-mainnet.g.alchemy.com/nft/v2/g3d4-b8b3P8N1puDX_X5HCh5ONljftBB/invalidateContract?contractAddress=0xcbF4BEB93B2eAA4E148D347553A9bd8fEd0D7Da3
+
                 let url = 'https://eth-mainnet.g.alchemy.com/nft/v2/g3d4-b8b3P8N1puDX_X5HCh5ONljftBB/getNFTs?contractAddresses[]=0xcbF4BEB93B2eAA4E148D347553A9bd8fEd0D7Da3&owner='+newWallet+'&withMetadata=true';
                 try{
                     const response = await fetch(url);
