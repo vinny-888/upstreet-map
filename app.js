@@ -129,7 +129,7 @@ async function loadNFTs(wallets){
         let count = 0;
         for(let i=0; i<wallets.length; i++){
             let wallet = wallets[i];
-            let url = 'https://eth-mainnet.g.alchemy.com/nft/v2/demo/getNFTs?contractAddresses[]=0xcbF4BEB93B2eAA4E148D347553A9bd8fEd0D7Da3&owner='+wallet+'&withMetadata=true';
+            let url = 'https://eth-mainnet.g.alchemy.com/nft/v2/g3d4-b8b3P8N1puDX_X5HCh5ONljftBB/getNFTs?contractAddresses[]=0xcbF4BEB93B2eAA4E148D347553A9bd8fEd0D7Da3&owner='+wallet+'&withMetadata=true';
             const response = await fetch(url);
             const tiles = await response.json();
             console.log(tiles);
