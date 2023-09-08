@@ -58,7 +58,8 @@ async function loadNFTs(wallets){
                             if(loc[0] != null && loc[1] != null){
                                 ownedNFTs[newWallet].push({
                                     x: parseInt(loc[0]),
-                                    y: parseInt(loc[1])
+                                    y: parseInt(loc[1]),
+                                    id: parseInt(tileMetadata.name.replace('Deed #', ''))
                                 })
                             }
                         }
@@ -81,7 +82,8 @@ async function loadNFTs(wallets){
                                     if(loc[0] != null && loc[1] != null){
                                         ownedNFTs[newWallet].push({
                                             x: parseInt(loc[0]),
-                                            y: parseInt(loc[1])
+                                            y: parseInt(loc[1]),
+                                            id: parseInt(tileMetadata.name.replace('Deed #', ''))
                                         })
                                     }
                                 }else{
@@ -110,7 +112,8 @@ async function loadNFTs(wallets){
                     if(tile.x != null && tile.y != null){
                         ownedNFTs[wallet].push({
                             x: tile.x,
-                            y: tile.y 
+                            y: tile.y,
+                            id: tile.id
                         })
                         count++;
                     }
@@ -140,7 +143,8 @@ async function loadNFTs(wallets){
                 let loc = location.value.replace('[', '').replace(']', '').split(',')
                 ownedNFTs[wallet].push({
                     x: parseInt(loc[0]),
-                    y: parseInt(loc[1])
+                    y: parseInt(loc[1]),
+                    id: parseInt(tileMetadata.name.replace('Deed #', ''))
                 })
                 count++;
             }
@@ -260,6 +264,7 @@ function loadWallet(walletArr){
         const clickedFeature = features[0];
         const x = clickedFeature.properties.x-128;
         const y = (clickedFeature.properties.y-128) * -1;
+        const token_id = (clickedFeature.properties.token_id);
         
     
         if(typeof selectedFeatureID === 'number') { // Need to change this
@@ -283,6 +288,19 @@ function loadWallet(walletArr){
         const linkElem = document.getElementById('link');
         linkElem.target = '_blank';
         linkElem.href = `https://upstreet.ai/adventure/#${x*64},${y*64}`;
+
+        let deedElm = document.getElementById('deed');
+        const linkElemOpensea = document.getElementById('opensea');
+        if(token_id != -1){
+            deedElm.style.display = 'block';
+            linkElemOpensea.style.display = 'block';
+            deedElm.textContent = `Deed #: ${token_id}`;
+            linkElemOpensea.target = '_blank';
+            linkElemOpensea.href = `https://opensea.io/assets/ethereum/0xcbf4beb93b2eaa4e148d347553a9bd8fed0d7da3/${token_id}`;
+        } else {
+            deedElm.style.display = 'none';
+            linkElemOpensea.style.display = 'none';
+        }
     
         // Display the info box
         document.getElementById('info-box').style.display = 'block';
@@ -327,10 +345,11 @@ function generateGrid(center, gridSize, width, offset, owner) {
                 },
                 properties: {
                     x, y,
+                    token_id: district[1],
                     // isXZero: x === gridSize/2 ? true : false,
                     // isXYZero: x === gridSize/2 && y === gridSize/2 ? true : false,
                     isOwned: owned,
-                    district_type: district
+                    district_type: district[0]
                 },
             };
 
@@ -395,21 +414,23 @@ function getOwner(x,y){
     let ownerIndex = -1;
     let ownerWallet = '';
     let owners = Object.keys(ownedNFTs)
+    let tokenId = -1;
     owners.forEach((owner, index)=>{
         ownedNFTs[owner].forEach((tile)=>{
             if(tile.x == x && tile.y == y){
                 ownerIndex = index;
                 ownerWallet = owner;
+                tokenId = tile.id;
             }
         })
     });
 
     if(x == 0 && y == 0){
-        return '#fff';
+        return ['#fff', tokenId];
     }else if(x == 0){
-        return '#000';
+        return ['#000', tokenId];
     } else {
-        return ownerIndex != -1 ? stringToColor(ownerWallet) : '#fff';
+        return [ownerIndex != -1 ? stringToColor(ownerWallet) : '#fff', tokenId];
     }
 }
 
