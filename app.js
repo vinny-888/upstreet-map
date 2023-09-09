@@ -1,5 +1,6 @@
 mapboxgl.accessToken = 'pk.eyJ1Ijoidmlubnk4ODgiLCJhIjoiY2xtNWRteTlxMWQwdjNmcDZhcWtlcGxqMiJ9.zudQQYFrNrsQqYbdQAdSdw';
 
+const mapSize = 350;
 const tileSizes = [1, 2, 4, 8, 16, 32];
 const zoomLevels = [11, 12, 13, 14, 15, 16];
 let selectedFeatureID = null;
@@ -168,14 +169,14 @@ function loadWallet(walletArr){
 
         await loadNFTs(walletArr);
     
-        const grid1 = generateGrid([0, 0], 256/1, 1); // This creates a 1024x1024 grid with each tile being 1x1 units
-        // const grid2 = generateGrid([0, 0], 256/2, 2);
-        // const grid4 = generateGrid([0, 0], 256/4, 4);
-        // const grid8 = generateGrid([0, 0], 256/8, 8);
-        // const grid16 = generateGrid([0, 0], 256/16, 16.5);
-        const grid32 = generateGrid([0, 0], 256/32, 32, 16.5);
+        const grid1 = generateGrid([0, 0], 350/1, 1); // This creates a 1024x1024 grid with each tile being 1x1 units
+        // const grid2 = generateGrid([0, 0], mapSize/2, 2);
+        // const grid4 = generateGrid([0, 0], mapSize/4, 4);
+        // const grid8 = generateGrid([0, 0], mapSize/8, 8);
+        // const grid16 = generateGrid([0, 0], mapSize/16, 16.5);
+        const grid32 = generateGrid([0, 0], mapSize/32, 32, 16.5);
 
-        const overlay = generateOverlay([0, 0], 256, 1/36.5, 0.5)
+        const overlay = generateOverlay([0, 0], mapSize, 1/36.5, 0.5)
 
         mainMap.addSource("myImageSource", {
             "type": "image",
@@ -262,8 +263,8 @@ function loadWallet(walletArr){
         }
     
         const clickedFeature = features[0];
-        const x = clickedFeature.properties.x-128;
-        const y = (clickedFeature.properties.y-128) * -1;
+        const x = clickedFeature.properties.x-(mapSize/2);
+        const y = (clickedFeature.properties.y-(mapSize/2)) * -1;
         const token_id = (clickedFeature.properties.token_id);
         
     
@@ -327,8 +328,8 @@ function generateGrid(center, gridSize, width, offset, owner) {
         for (let y = -1; y < gridSize; y++) {
             const baseX = start[0] + x * lonChange;
             const baseY = start[1] + y * latChange;
-            const district = getOwner(x-128,(y-128)*-1);
-            const owned = isOwned(x-128,(y-128)*-1);
+            const district = getOwner(x-(mapSize/2),(y-(mapSize/2))*-1);
+            const owned = isOwned(x-(mapSize/2),(y-(mapSize/2))*-1);
             const cube = {
                 type: 'Feature',
                 geometry: {
@@ -385,9 +386,9 @@ function generateOverlay(center, gridSize, width, offset) {
     ];
 
     const baseX1 = start[0];
-    const baseX2 = start[0] + 256 * lonChange;
+    const baseX2 = start[0] + mapSize * lonChange;
     const baseY1 = start[1];
-    const baseY2 = start[1] + 256 * latChange;
+    const baseY2 = start[1] + mapSize * latChange;
 
     return [
         [baseX1, baseY1],
@@ -428,7 +429,7 @@ function getOwner(x,y){
     if(x == 0 && y == 0){
         return ['#fff', tokenId];
     }else if(x == 0){
-        return ['#000', tokenId];
+        return ['#746855', tokenId];
     } else {
         return [ownerIndex != -1 ? stringToColor(ownerWallet) : '#fff', tokenId];
     }
