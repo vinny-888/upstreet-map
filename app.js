@@ -35,7 +35,7 @@ function loadNewWallet(){
 async function loadNFTs(wallets){
     if(!wallets || wallets[0] == ''){
 
-        if(true){
+        if(false){
             let start = 0;
             for(let i=start; i<holders_wallets.length; i++){
                 let newWallet = holders_wallets[i];
