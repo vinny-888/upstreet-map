@@ -56,6 +56,9 @@
         #deed{
             color: #000;
         }
+        #map_switcher{
+            color: #fff;
+        }
     </style>
 </head>
 <body>
@@ -65,6 +68,8 @@
         <input type="button" value="Toggle Map" onclick="toggleMap()">
         <br>
         <span id="claimed"></span><span id="owners"></span>
+        <br>
+        <span ><a id="map_switcher" href="#" onclick="toggleMaType()">Long Map</a></span>
     </div>
     <div id="info-box" style="display: none;">
         <p id="coords"></p>
@@ -74,10 +79,10 @@
     </div>
     <div id="map">
         <div id="infoBox" style="display:none;"></div>
-        <div id="overviewMap"></div>
+        <!-- <div id="overviewMap"></div> -->
     </div>
-    <script src="all_wallets.js?v=1.8"></script>
-    <script src="wallets.js?v=1.8"></script>
-    <script src="app.js?v=1.8"></script>
+    <script src="all_wallets.js?v=1.9"></script>
+    <script src="wallets.js?v=1.9"></script>
+    <script src="app.js?v=1.9"></script>
 </body>
 </html>

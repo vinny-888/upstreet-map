@@ -1,6 +1,6 @@
 mapboxgl.accessToken = 'pk.eyJ1Ijoidmlubnk4ODgiLCJhIjoiY2xtNWRteTlxMWQwdjNmcDZhcWtlcGxqMiJ9.zudQQYFrNrsQqYbdQAdSdw';
 
-const mapSize = 350;
+let mapSize = 350;
 const tileSizes = [1, 2, 4, 8, 16, 32];
 const zoomLevels = [11, 12, 13, 14, 15, 16];
 let selectedFeatureID = null;
@@ -14,15 +14,17 @@ function replaceQueryParam(param, newval, search) {
     return (query.length > 2 ? query + "&" : "?") + (newval ? param + "=" + newval : '');
 }
 
-const urlParams = new URLSearchParams(window.location.search);
-const wallet = urlParams.get('wallet')
-if(wallet){
-    document.getElementById('wallet').value = wallet;
-    let walletArr = wallet.split(',')
+function loadMap(){
+    const urlParams = new URLSearchParams(window.location.search);
+    const wallet = urlParams.get('wallet')
+    if(wallet){
+        document.getElementById('wallet').value = wallet;
+        let walletArr = wallet.split(',')
 
-    loadWallet(walletArr);
-} else {
-    loadWallet(['']);
+        loadWallet(walletArr);
+    } else {
+        loadWallet(['']);
+    }
 }
 
 function loadNewWallet(){
@@ -156,7 +158,21 @@ async function loadNFTs(wallets){
     }
 }
 
+function toggleMaType(){
+    let map_switcher = document.getElementById('map_switcher');
+    if(map_switcher.innerHTML == 'Long Map'){
+        map_switcher.innerHTML = 'Square Map';
+        mapSize = 1024+512;
+        loadMap();
+    } else {
+        map_switcher.innerHTML = 'Long Map';
+        mapSize = 350;
+        loadMap();
+    }
+}
+
 function loadWallet(walletArr){
+    document.getElementById('map').innerHTML = '<div id="infoBox" style="display:none;"></div>';
 
     mainMap = new mapboxgl.Map({
         container: 'map', 
@@ -169,7 +185,7 @@ function loadWallet(walletArr){
 
         await loadNFTs(walletArr);
     
-        const grid1 = generateGrid([0, 0], 350/1, 1); // This creates a 1024x1024 grid with each tile being 1x1 units
+        const grid1 = generateGrid([0, 0], mapSize/1, 1); // This creates a 1024x1024 grid with each tile being 1x1 units
         // const grid2 = generateGrid([0, 0], mapSize/2, 2);
         // const grid4 = generateGrid([0, 0], mapSize/4, 4);
         // const grid8 = generateGrid([0, 0], mapSize/8, 8);
@@ -324,7 +340,14 @@ function generateGrid(center, gridSize, width, offset, owner) {
         center[1] - (gridSize * latChange) / 2 + ((offset ? offset : 0) * lonChange/width),
     ];
 
-    for (let x = -1; x < gridSize; x++) {
+    let offsetX = 0;
+    let inset = 0;
+    let map_switcher = document.getElementById('map_switcher');
+    if(map_switcher.innerHTML == 'Square Map'){
+        offsetX = 64;
+        inset = (mapSize/2);
+    }
+    for (let x = inset-offsetX-1; x < gridSize - inset + offsetX; x++) {
         for (let y = -1; y < gridSize; y++) {
             const baseX = start[0] + x * lonChange;
             const baseY = start[1] + y * latChange;
@@ -471,3 +494,5 @@ function toggleMap() {
         mainMap.setPaintProperty('grid-1', 'fill-outline-color', '#888888');
     }
 }
+
+loadMap();
