@@ -1,6 +1,6 @@
 mapboxgl.accessToken = 'pk.eyJ1Ijoidmlubnk4ODgiLCJhIjoiY2xtNWRteTlxMWQwdjNmcDZhcWtlcGxqMiJ9.zudQQYFrNrsQqYbdQAdSdw';
 
-let mapSize = 350;
+let mapSize = 420;
 const tileSizes = [1, 2, 4, 8, 16, 32];
 const zoomLevels = [11, 12, 13, 14, 15, 16];
 let selectedFeatureID = null;
