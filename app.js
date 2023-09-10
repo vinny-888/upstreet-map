@@ -428,7 +428,7 @@ function getOwner(x,y){
 
     if(x == 0 && y == 0){
         return ['#fff', tokenId];
-    }else if(x == 0){
+    } else if(x == 0){
         return ['#746855', tokenId];
     } else {
         return [ownerIndex != -1 ? stringToColor(ownerWallet) : '#fff', tokenId];
