@@ -190,7 +190,7 @@ function loadWallet(walletArr){
         // const grid4 = generateGrid([0, 0], mapSize/4, 4);
         // const grid8 = generateGrid([0, 0], mapSize/8, 8);
         // const grid16 = generateGrid([0, 0], mapSize/16, 16.5);
-        const grid32 = generateGrid([0, 0], mapSize/32, 32, 15.5);
+        const grid32 = generateGrid([0, 0], mapSize/32, 32, 18.5);
 
         const overlay = generateOverlay([0, 0], mapSize, 1/36.5, 0.5)
 
