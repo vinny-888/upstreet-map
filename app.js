@@ -190,7 +190,8 @@ function loadWallet(walletArr){
         // const grid4 = generateGrid([0, 0], mapSize/4, 4);
         // const grid8 = generateGrid([0, 0], mapSize/8, 8);
         // const grid16 = generateGrid([0, 0], mapSize/16, 16.5);
-        const grid32 = generateGrid([0, 0], mapSize/32, 32, 18.5);
+        const grid16 = generateGrid([0, 0], mapSize/16, 16, 18.5);
+        const grid32 = generateGrid([0, 0], mapSize/32, 32, 18.5 + 16);
 
         const overlay = generateOverlay([0, 0], mapSize, 1/36.5, 0.5)
 
@@ -212,6 +213,12 @@ function loadWallet(walletArr){
         mainMap.addSource('grid1', {
             type: 'geojson',
             data: grid1,
+            generateId: true
+        });
+
+        mainMap.addSource('grid16', {
+            type: 'geojson',
+            data: grid16,
             generateId: true
         });
 
@@ -247,7 +254,16 @@ function loadWallet(walletArr){
             },
         });
 
-        
+        mainMap.addLayer({
+            id: 'grid-16',
+            type: 'line',
+            source: 'grid16',
+            layout: {},
+            paint: {
+                'line-color': '#AAA',
+                'line-opacity': 0.5
+            },
+        });
 
         mainMap.addLayer({
             id: 'grid-32',
@@ -255,14 +271,19 @@ function loadWallet(walletArr){
             source: 'grid32',
             layout: {},
             paint: {
-                'line-color': '#AAA',
-                'line-opacity': 0.5,
+                'line-color': '#000',
+                'line-opacity': 0.75,
+                'line-width': 1.5
             },
         });
+        
     
         mainMap.setLayoutProperty(`grid-1`, 'visibility', 'visible');
+        mainMap.setLayoutProperty(`grid-16`, 'visibility', 'visible');
         mainMap.setLayoutProperty(`grid-32`, 'visibility', 'visible');
         mainMap.setLayoutProperty(`overlay`, 'visibility', 'none');
+
+        mainMap.moveLayer('grid-32', 'grid-16');
         
         // Fit the map to the grid's bounds
         mainMap.fitBounds(grid1.bounds, {
@@ -450,7 +471,7 @@ function getOwner(x,y){
     });
 
     if(x == 0 && y == 0){
-        return ['#fff', tokenId];
+        return ['#FF00FF', tokenId];
     } else if(x == 0){
         return ['#746855', tokenId];
     } else {
