@@ -1,6 +1,6 @@
 mapboxgl.accessToken = 'pk.eyJ1Ijoidmlubnk4ODgiLCJhIjoiY2xtNWRteTlxMWQwdjNmcDZhcWtlcGxqMiJ9.zudQQYFrNrsQqYbdQAdSdw';
 
-let mapSize = 420;
+let mapSize = 384;
 const tileSizes = [1, 2, 4, 8, 16, 32];
 const zoomLevels = [11, 12, 13, 14, 15, 16];
 let selectedFeatureID = null;
@@ -190,25 +190,25 @@ function loadWallet(walletArr){
         // const grid4 = generateGrid([0, 0], mapSize/4, 4);
         // const grid8 = generateGrid([0, 0], mapSize/8, 8);
         // const grid16 = generateGrid([0, 0], mapSize/16, 16.5);
-        const grid16 = generateGrid([0, 0], mapSize/16, 16, 18.5);
-        const grid32 = generateGrid([0, 0], mapSize/32, 32, 18.5 + 16);
+        const grid16 = generateGrid([0, 0], mapSize/16, 16, 0.5);
+        const grid32 = generateGrid([0, 0], mapSize/32-1, 32, 0.5);
 
-        const overlay = generateOverlay([0, 0], mapSize, 1/36.5, 0.5)
+        // const overlay = generateOverlay([0, 0], mapSize, 1/36.5, 0.5)
 
-        mainMap.addSource("myImageSource", {
-            "type": "image",
-            "url": "./map/0_0.png",
-            "coordinates": overlay
-        });
+        // mainMap.addSource("myImageSource", {
+        //     "type": "image",
+        //     "url": "./map/0_0.png",
+        //     "coordinates": overlay
+        // });
 
-        mainMap.addLayer({
-            "id": "overlay",
-            "source": "myImageSource",
-            "type": "raster",
-            "paint": {
-            "raster-opacity": 1.0
-            }
-        });
+        // mainMap.addLayer({
+        //     "id": "overlay",
+        //     "source": "myImageSource",
+        //     "type": "raster",
+        //     "paint": {
+        //     "raster-opacity": 1.0
+        //     }
+        // });
     
         mainMap.addSource('grid1', {
             type: 'geojson',
@@ -368,8 +368,8 @@ function generateGrid(center, gridSize, width, offset, owner) {
         offsetX = 64;
         inset = (mapSize/2);
     }
-    for (let x = inset-offsetX-1; x < gridSize - inset + offsetX; x++) {
-        for (let y = -1; y < gridSize; y++) {
+    for (let x = inset-offsetX; x < gridSize - inset + offsetX; x++) {
+        for (let y = 0; y < gridSize; y++) {
             const baseX = start[0] + x * lonChange;
             const baseY = start[1] + y * latChange;
             const district = getOwner(x-(mapSize/2),(y-(mapSize/2))*-1);
