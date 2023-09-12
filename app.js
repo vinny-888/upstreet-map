@@ -193,22 +193,22 @@ function loadWallet(walletArr){
         const grid16 = generateGrid([0, 0], mapSize/16, 16, 0.5);
         const grid32 = generateGrid([0, 0], mapSize/32-1, 32, 0.5);
 
-        // const overlay = generateOverlay([0, 0], mapSize, 1/36.5, 0.5)
+        const overlay = generateOverlay([0, 0], mapSize, 1/54.75, 0.5)
 
-        // mainMap.addSource("myImageSource", {
-        //     "type": "image",
-        //     "url": "./map/0_0.png",
-        //     "coordinates": overlay
-        // });
+        mainMap.addSource("myImageSource", {
+            "type": "image",
+            "url": "./map/0_0.png",
+            "coordinates": overlay
+        });
 
-        // mainMap.addLayer({
-        //     "id": "overlay",
-        //     "source": "myImageSource",
-        //     "type": "raster",
-        //     "paint": {
-        //     "raster-opacity": 1.0
-        //     }
-        // });
+        mainMap.addLayer({
+            "id": "overlay",
+            "source": "myImageSource",
+            "type": "raster",
+            "paint": {
+            "raster-opacity": 1.0
+            }
+        });
     
         mainMap.addSource('grid1', {
             type: 'geojson',
