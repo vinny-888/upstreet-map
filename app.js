@@ -149,7 +149,39 @@ async function loadNFTs(wallets){
                     y: parseInt(loc[1]),
                     id: parseInt(tileMetadata.name.replace('Deed #', ''))
                 })
+                
                 count++;
+            }
+            let pageKey = tiles.pageKey;
+            while(pageKey){
+                let url2 = 'https://eth-mainnet.g.alchemy.com/nft/v2/g3d4-b8b3P8N1puDX_X5HCh5ONljftBB/getNFTs?contractAddresses[]=0xcbF4BEB93B2eAA4E148D347553A9bd8fEd0D7Da3&owner='+wallet+'&withMetadata=true&pageKey='+pageKey;
+                try{
+                    const response2 = await fetch(url2);
+                    const tiles2 = await response2.json();
+                    // console.log(tiles2);
+            
+                    for(let i=0; i<tiles2.ownedNfts.length; i++){
+                        let tileMetadata = tiles2.ownedNfts[i].metadata;
+                        let location = tileMetadata.attributes.find((att)=>att.trait_type == 'Location');
+                        if(location && location.value){
+                            let loc = location.value.replace('[', '').replace(']', '').split(',')
+                            if(loc[0] != null && loc[1] != null){
+                                ownedNFTs[wallet].push({
+                                    x: parseInt(loc[0]),
+                                    y: parseInt(loc[1]),
+                                    id: parseInt(tileMetadata.name.replace('Deed #', ''))
+                                })
+                            }
+                        }else{
+                            // console.log('error: ', tiles2.ownedNfts[i])
+                        }
+                    }
+                    console.log('i='+i, JSON.stringify(ownedNFTs));
+                    pageKey = tiles2.pageKey;
+                } catch(err){
+                    console.log(err);
+                }
+                await new Promise(r => setTimeout(r, (60/60)*1000));
             }
             console.log('ownedNFTs:',ownedNFTs);
             // await new Promise(r => setTimeout(r, (60/10)*1000));
@@ -192,7 +224,128 @@ function loadWallet(walletArr){
         // const grid16 = generateGrid([0, 0], mapSize/16, 16.5);
         const grid16 = generateGrid([0, 0], mapSize/16, 16, 0.5);
         const grid32 = generateGrid([0, 0], mapSize/32-1, 32, 0.5);
+/*
+        const latChange = 64 / 111000 * mapSize; // approximately 0.000576
+        const lonChange = latChange; // approximation
 
+        const start = [
+            0,
+            0,
+        ];
+
+        mainMap.addSource("lineSource1", generateLines([0, 0], 16));
+
+        mainMap.addLayer({
+            "id": "line1",
+            "type": "line",
+            "source": "lineSource1",
+            "layout": {},
+            "paint": {
+                "line-color": "green",
+                "line-width": 2
+                // "fill-opacity": 0.25
+            }
+        });
+
+        mainMap.addSource("lineSource2", generateLines([0, 0], 32));
+
+        mainMap.addLayer({
+            "id": "line2",
+            "type": "line",
+            "source": "lineSource2",
+            "layout": {},
+            "paint": {
+                "line-color": "#FFEA00",
+                "line-width": 2
+                // "fill-opacity": 0.25
+            }
+        });
+
+        mainMap.addSource("lineSource3", generateLines([0, 0], 48));
+
+        mainMap.addLayer({
+            "id": "line3",
+            "type": "line",
+            "source": "lineSource3",
+            "layout": {},
+            "paint": {
+                "line-color": "orange",
+                "line-width": 2
+                // "fill-opacity": 0.25
+            }
+        });
+
+        mainMap.addSource("lineSource4", generateLines([0, 0], 64));
+
+        mainMap.addLayer({
+            "id": "line4",
+            "type": "line",
+            "source": "lineSource4",
+            "layout": {},
+            "paint": {
+                "line-color": "red",
+                "line-width": 2
+                // "fill-opacity": 0.25
+            }
+        });
+
+        mainMap.addSource("circleSource1", createGeoJSONCircle([0, 0], (32*32)/1000));
+
+        mainMap.addLayer({
+            "id": "circle1",
+            "type": "line",
+            "source": "circleSource1",
+            "layout": {},
+            "paint": {
+                "line-color": "green",
+                "line-width": 2
+                // "fill-opacity": 0.25
+            }
+        });
+
+        mainMap.addSource("circleSource2", createGeoJSONCircle([0, 0], (64*32)/1000));
+
+        mainMap.addLayer({
+            "id": "circle2",
+            "type": "line",
+            "source": "circleSource2",
+            "layout": {},
+            "paint": {
+                "line-color": "#FFEA00",
+                "line-width": 2
+                // "fill-opacity": 0.25
+            }
+        });
+
+        mainMap.addSource("circleSource3", createGeoJSONCircle([0, 0], (96*32)/1000));
+
+        mainMap.addLayer({
+            "id": "circle3",
+            "type": "line",
+            "source": "circleSource3",
+            "layout": {},
+            "paint": {
+                "line-color": "orange",
+                "line-width": 2
+                // "fill-opacity": 0.25
+            }
+        });
+
+        mainMap.addSource("circleSource4", createGeoJSONCircle([0, 0], (128*32)/1000));
+
+        mainMap.addLayer({
+            "id": "circle4",
+            "type": "line",
+            "source": "circleSource4",
+            "layout": {},
+            "paint": {
+                "line-color": "red",
+                "line-width": 2
+                // "fill-opacity": 0.25
+            }
+        });
+
+*/
         const overlay = generateOverlay([0, 0], mapSize, 1/54.75, 0.5)
 
         mainMap.addSource("myImageSource", {
@@ -284,6 +437,19 @@ function loadWallet(walletArr){
         mainMap.setLayoutProperty(`overlay`, 'visibility', 'none');
 
         mainMap.moveLayer('grid-32', 'grid-16');
+
+        /*
+        mainMap.moveLayer('circle4', 'grid-16');
+        mainMap.moveLayer('circle3', 'circle4');
+        mainMap.moveLayer('circle2', 'circle3');
+        mainMap.moveLayer('circle1', 'circle2');
+
+
+        mainMap.moveLayer('line4', 'grid-16');
+        mainMap.moveLayer('line3', 'line4');
+        mainMap.moveLayer('line2', 'line3');
+        mainMap.moveLayer('line1', 'line2');
+        */
         
         // Fit the map to the grid's bounds
         mainMap.fitBounds(grid1.bounds, {
@@ -419,6 +585,31 @@ function generateGrid(center, gridSize, width, offset, owner) {
     };
 }
 
+function generateLines(center, width) {
+
+    const latChange = 64 / 111000 * width; // approximately 0.000576
+    const lonChange = latChange; // approximation
+
+
+    return {
+        type: 'geojson',
+        data: {
+            type: 'Feature',
+            geometry: {
+                type: 'LineString',
+                coordinates: 
+                    [
+                        [center[0]+latChange, center[1]-(latChange*1024)],
+                        [center[0]+latChange, center[1]+(latChange*1024)],
+                        [center[0]-latChange, center[1]-(latChange*1024)],
+                        [center[0]-latChange, center[1]+(latChange*1024)],
+                    ],
+            },
+            properties: {},
+        }
+    };
+}
+
 function generateOverlay(center, gridSize, width, offset) {
 
     const latChange = 64 / 111000 * width; // approximately 0.000576
@@ -515,5 +706,44 @@ function toggleMap() {
         mainMap.setPaintProperty('grid-1', 'fill-outline-color', '#888888');
     }
 }
+
+var createGeoJSONCircle = function(center, radiusInKm, points) {
+    if(!points) points = 64;
+
+    var coords = {
+        latitude: center[1],
+        longitude: center[0]
+    };
+
+    var km = radiusInKm;
+
+    var ret = [];
+    var distanceX = km/(111.320*Math.cos(coords.latitude*Math.PI/180));
+    var distanceY = km/110.574;
+
+    var theta, x, y;
+    for(var i=0; i<points; i++) {
+        theta = (i/points)*(2*Math.PI);
+        x = distanceX*Math.cos(theta);
+        y = distanceY*Math.sin(theta);
+
+        ret.push([coords.longitude+x, coords.latitude+y]);
+    }
+    ret.push(ret[0]);
+
+    return {
+        "type": "geojson",
+        "data": {
+            "type": "FeatureCollection",
+            "features": [{
+                "type": "Feature",
+                "geometry": {
+                    "type": "Polygon",
+                    "coordinates": [ret]
+                }
+            }]
+        }
+    };
+};
 
 loadMap();
